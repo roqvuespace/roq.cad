@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 3.15)
+project(SpaceshipCAD)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Find GLFW
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
+
+# OpenGL Framework for macOS
+find_library(OpenGL_LIBRARY OpenGL)
+
+# Include directories
+include_directories(
+    ${GLFW_INCLUDE_DIRS}
+    external/imgui
+    external/imgui/backends
+)
+
+# Source files
+set(IMGUI_SOURCES
+    external/imgui/imgui.cpp
+    external/imgui/imgui_draw.cpp
+    external/imgui/imgui_tables.cpp
+    external/imgui/imgui_widgets.cpp
+    external/imgui/backends/imgui_impl_glfw.cpp
+    external/imgui/backends/imgui_impl_opengl3.cpp
+)
+
+set(SOURCES
+    src/main.cpp
+    ${IMGUI_SOURCES}
+)
+
+add_executable(SpaceshipCAD ${SOURCES})
+
+target_link_libraries(SpaceshipCAD
+    ${GLFW_LIBRARIES}
+    ${OpenGL_LIBRARY}
+)
+
+# macOS frameworks required for OpenGL and windowing
+if(APPLE)
+    find_library(COCOA_LIBRARY Cocoa)
+    find_library(IOKIT_LIBRARY IOKit)
+    find_library(COREVIDEO_LIBRARY CoreVideo)
+    target_link_libraries(SpaceshipCAD
+        ${COCOA_LIBRARY}
+        ${IOKIT_LIBRARY}
+        ${COREVIDEO_LIBRARY}
+    )
+endif()
